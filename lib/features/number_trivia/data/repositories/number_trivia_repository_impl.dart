@@ -20,26 +20,68 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
       required this.localDataSource,
       required this.networkInfo});
 
+  // @override
+  // Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(
+  //     int number) async {
+  //   return await _getTrivia(() {
+  //     return remoteDataSource!.getConcreteNumberTrivia(number);
+  //   });
+  // }
+
+  // @override
+  // Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia() async {
+  //   return await _getTrivia(() {
+  //     return remoteDataSource!.getRandomNumberTrivia();
+  //   });
+  // }
+
+  // Future<Either<Failure, NumberTrivia>> _getTrivia(
+  //     _CongreteOrRandomChooser getCongreteOrRandom) async {
+
+  //   if (await networkInfo!.isConnected) {
+  //     try {
+  //       final remoteTrivia = await getCongreteOrRandom();
+  //       localDataSource?.cacheNumberTrivia(remoteTrivia);
+  //       return Right(remoteTrivia);
+  //     } on ServerException {
+  //       return Left(ServerFailure());
+  //     }
+  //   } else {
+  //     try {
+  //       final locaTrivia = await localDataSource!.getLastNumberTrivia();
+  //       return Right(locaTrivia);
+  //     } on CacheException {
+  //       return Left(CacheFailure());
+  //     }
+  //   }
+  // }
   @override
   Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(
       int number) async {
-    return await _getTrivia(() {
-      return remoteDataSource!.getConcreteNumberTrivia(number);
-    });
+    if (await networkInfo!.isConnected) {
+      try {
+        final remoteTrivia =
+            await remoteDataSource!.getConcreteNumberTrivia(number);
+        localDataSource?.cacheNumberTrivia(remoteTrivia);
+        return Right(remoteTrivia);
+      } on ServerException {
+        return Left(ServerFailure());
+      }
+    } else {
+      try {
+        final locaTrivia = await localDataSource!.getLastNumberTrivia();
+        return Right(locaTrivia);
+      } on CacheException {
+        return Left(CacheFailure());
+      }
+    }
   }
 
   @override
   Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia() async {
-    return await _getTrivia(() {
-      return remoteDataSource!.getRandomNumberTrivia();
-    });
-  }
-
-  Future<Either<Failure, NumberTrivia>> _getTrivia(
-      _CongreteOrRandomChooser getCongreteOrRandom) async {
     if (await networkInfo!.isConnected) {
       try {
-        final remoteTrivia = await getCongreteOrRandom();
+        final remoteTrivia = await remoteDataSource!.getRandomNumberTrivia();
         localDataSource?.cacheNumberTrivia(remoteTrivia);
         return Right(remoteTrivia);
       } on ServerException {
