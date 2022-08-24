@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 
 import 'package:flutter_clean_architecture_tdd/core/network/network_info.dart';
 import 'package:flutter_clean_architecture_tdd/features/number_trivia/data/datasources/number_trivia_local_source.dart';
-import 'package:flutter_clean_architecture_tdd/features/number_trivia/data/datasources/number_trivia_remote_source.dart';
+import 'package:flutter_clean_architecture_tdd/features/number_trivia/data/datasources/number_trivia_remote_data_source.dart';
 import 'package:flutter_clean_architecture_tdd/features/number_trivia/data/repositories/number_trivia_repository_impl.dart';
 
 class MockRemoteDataSource extends Mock
@@ -71,7 +71,7 @@ void main() {
           'should return remote data when the call to remote data source is success',
           () async {
         //arrange
-        when(mockRemoteDataSource!.getConcreteNumberTrivia(any))
+        when(mockRemoteDataSource!.getConcreteNumberTrivia(1))
             .thenAnswer((_) async => tNumberTriviaModel);
         // act
         final result = await repository!.getConcreteNumberTrivia(tNumber);
@@ -83,7 +83,7 @@ void main() {
           'should cache data locally when the call to remote data source is success',
           () async {
         //arrange
-        when(mockRemoteDataSource!.getConcreteNumberTrivia(any))
+        when(mockRemoteDataSource!.getConcreteNumberTrivia(1))
             .thenAnswer((_) async => tNumberTriviaModel);
         // act
         await repository!.getConcreteNumberTrivia(tNumber);
@@ -95,7 +95,7 @@ void main() {
           'should return server failure when the call to remote data source is unsuccessful',
           () async {
         //arrange
-        when(mockRemoteDataSource!.getConcreteNumberTrivia(any))
+        when(mockRemoteDataSource!.getConcreteNumberTrivia(1))
             .thenThrow(ServerException());
         // act
         final result = await repository!.getConcreteNumberTrivia(tNumber);
